@@ -1,33 +1,32 @@
-const express = require("express")
-const  bodyParser = require("body-parser")
-const app = express()
-app.use(bodyParser.urlencoded({extended : true}))
+ //server.js
+const express = require('express');
+const app = express();
+const authRoutes = require('./routes/auth');
+const inforoute = require('./routes/userinfo');
+
+const protectedRoute = require('./routes/protectedRoute');
+const bodyParser = require("body-parser")
 app.use(bodyParser.json())
-const UserRoute = require('./routes/User')
-
-
-const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
-
-mongoose.connect(dbConfig.uri, {
-    useNewUrlParser: true,
+mongoose.connect("mongodb://0.0.0.0:27017/login_db", {
+useNewUrlParser: true,
 }).then(() => {
-    console.log("Databse Connected Successfully!!");    
+console.log("Databse Connected Successfully!!");
 }).catch(err => {
-    console.log('Could not connect to the database', err);
-    process.exit();
+console.log('Could not connect to the database', err);
+process.exit();
 });
+app.use(express.json());
+app.use('/auth', authRoutes);
+app.use('/protected', protectedRoute);
+app.use('/userinfo', inforoute);
 
-app.get('/', async (req, res)=>{
-    res.json({
-       "message":"this is default response" 
-    })
+const PORT = process.env.PORT || 3000;
+app.listen(82, () => {
+console.log(`Server is running on port 82`);
+});
+app.get('/',(req,res)=>{
+res.json({
+"message":"it's work"
 })
-
-app.listen(82, ()=> {
-    console.log("this server runing on port 82 ")
 })
-
-
-app.use('/user',UserRoute)
